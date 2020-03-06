@@ -619,7 +619,7 @@
 
 // <o> CLI_MAX_CMD_LEN - Command max length. 
 #ifndef CLI_MAX_CMD_LEN
-#define CLI_MAX_CMD_LEN 21
+#define CLI_MAX_CMD_LEN 40
 #endif
 
 // <q> CLI_RTT_ENABLE  - Enable CLI RTT backend.
@@ -4273,7 +4273,7 @@
 
 // <o> NRF_CLI_ARGC_MAX - Maximum number of parameters passed to the command handler. 
 #ifndef NRF_CLI_ARGC_MAX
-#define NRF_CLI_ARGC_MAX 12
+#define NRF_CLI_ARGC_MAX 32
 #endif
 
 // <q> NRF_CLI_BUILD_IN_CMDS_ENABLED  - CLI built-in commands.
@@ -4285,7 +4285,7 @@
 
 // <o> NRF_CLI_CMD_BUFF_SIZE - Maximum buffer size for a single command. 
 #ifndef NRF_CLI_CMD_BUFF_SIZE
-#define NRF_CLI_CMD_BUFF_SIZE 128
+#define NRF_CLI_CMD_BUFF_SIZE 256
 #endif
 
 // <q> NRF_CLI_ECHO_STATUS  - CLI echo status. If set, echo is ON.
