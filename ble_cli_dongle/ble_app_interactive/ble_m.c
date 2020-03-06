@@ -75,8 +75,8 @@
 #define NEXT_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(30000)                 /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT   3                                      /**< Max count of connection parameter update. */
 
-#define APP_ADV_DURATION               18000                                  /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
-
+// #define APP_ADV_DURATION               18000                                  /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION               0                                  
 #define APP_FEATURE_NOT_SUPPORTED      BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2   /**< Reply when unsupported features are requested. */
 #define CCCD_DESCRIPTOR_UUID           BLE_UUID_DESCRIPTOR_CLIENT_CHAR_CONFIG /**< UUID of characteristic CCCD descriptors. */
 #define L2CAP_HDR_LEN                  4                                      /**< Length of a L2CAP header, in bytes. */
