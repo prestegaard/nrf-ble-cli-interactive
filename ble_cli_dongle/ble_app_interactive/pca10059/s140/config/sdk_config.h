@@ -4335,7 +4335,7 @@
  
 
 #ifndef NRF_CLI_VT100_COLORS_ENABLED
-#define NRF_CLI_VT100_COLORS_ENABLED 1
+#define NRF_CLI_VT100_COLORS_ENABLED 0
 #endif
 
 // <q> NRF_CLI_STATISTICS_ENABLED  - Enable CLI statistics.
@@ -4349,7 +4349,7 @@
  
 
 #ifndef NRF_CLI_LOG_BACKEND
-#define NRF_CLI_LOG_BACKEND 1
+#define NRF_CLI_LOG_BACKEND 0
 #endif
 
 // <q> NRF_CLI_USES_TASK_MANAGER_ENABLED  - Enable CLI to use task_manager
