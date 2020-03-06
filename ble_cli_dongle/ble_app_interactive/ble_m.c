@@ -595,6 +595,12 @@ static void device_to_list_add(ble_gap_evt_adv_report_t const * p_adv_report)
                    p_adv_report->peer_addr.addr,
                    sizeof(p_adv_report->peer_addr.addr));
 
+            memcpy(m_device[idx].adv_data,
+                   adv_data.p_data,
+                   adv_data.data_len);
+
+            m_device[idx].adv_data_len = adv_data.data_len;
+
             m_device[idx].is_not_empty = true;
 
             // Search for advertising names.

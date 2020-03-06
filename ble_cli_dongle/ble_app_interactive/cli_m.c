@@ -414,6 +414,27 @@ static void device_list_print(nrf_cli_t const * p_cli, scanned_device_t * p_devi
     }
 }
 
+static void device_list_print_details(nrf_cli_t const * p_cli, scanned_device_t * p_device)
+{
+    for (uint8_t i = 0; i < DEVICE_TO_FIND_MAX; i++)
+    {
+        if (p_device[i].is_not_empty)
+        {
+            nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Device ");
+
+            char buffer[ADDR_STRING_LEN];
+            int_addr_to_hex_str(buffer, BLE_GAP_ADDR_LEN, p_device[i].addr);
+
+            nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "%s %s\n", buffer,  p_device[i].dev_name);
+            for(uint8_t j = 0; j < p_device[i].adv_data_len; j++)
+            {                
+                nrf_cli_fprintf(p_cli,NRF_CLI_NORMAL, "0x%02x, ", p_device[i].adv_data[j]);
+            }
+            nrf_cli_fprintf(p_cli,NRF_CLI_NORMAL, "\n");
+        }
+    }
+}
+
 
 /**@brief Function for setting the CCCD Descriptor value.
  *
@@ -1413,6 +1434,32 @@ static void cmd_devices_display(nrf_cli_t const * p_cli, size_t argc, char ** ar
     device_list_print(p_cli, p_device_list);
 }
 
+static void cmd_devices_display_details(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    if (argc >= 2)
+    {
+        if (nrf_cli_help_requested(p_cli))
+        {
+            nrf_cli_help_print(p_cli, NULL, 0);
+            return;
+        }
+        else
+        {
+            nrf_cli_fprintf(p_cli,
+                            NRF_CLI_ERROR,
+                            "%s:%s%s\n",
+                            argv[0],
+                            " bad parameter ",
+                            argv[1]);
+            return;
+        }
+    }
+
+    // Print connectable devices from scan data.
+    scanned_device_t * p_device_list = scan_device_info_get();
+    device_list_print_details(p_cli, p_device_list);
+}
+
 
 static void cmd_remove(nrf_cli_t const * p_cli, size_t argc, char ** argv)
 {
@@ -2137,6 +2184,8 @@ NRF_CLI_CMD_REGISTER(bonded_devices,
                      "List bonded devices (The devices are identified by public address).",
                      cmd_bonded_devices_display);
 NRF_CLI_CMD_REGISTER(devices, NULL, "List available devices.", cmd_devices_display);
+NRF_CLI_CMD_REGISTER(device_details, NULL, "List available device details.", cmd_devices_display_details);
+
 NRF_CLI_CMD_REGISTER(remove_bond, &m_sub_remove, "<subcmd> Remove bonded device.", cmd_remove);
 NRF_CLI_CMD_REGISTER(key_reply, NULL, "<key> Enter key from another device.", cmd_key_reply);
 NRF_CLI_CMD_REGISTER(pair,

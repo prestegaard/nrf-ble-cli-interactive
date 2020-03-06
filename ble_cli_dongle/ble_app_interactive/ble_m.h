@@ -72,6 +72,8 @@ typedef struct
     bool    is_not_empty;                   /**< Indicates that the structure is not empty. */
     uint8_t addr[BLE_GAP_ADDR_LEN];         /**< Device address. */
     char    dev_name[DEVICE_NAME_MAX_SIZE]; /**< Device name. */
+    uint8_t adv_data[32];                    /**< Advertisement data.  */
+    uint8_t adv_data_len;                   /**< Lenght of advertisement data.  */
 } scanned_device_t;
 
 typedef struct
