@@ -51,6 +51,7 @@
 #include "nfc_central_m.h"
 #include "adafruit_pn532.h"
 
+#define INVALID_INPUT_ERROR   -127
 #define UNKNOWN_PARAMETER     "unknown parameter: "
 #define WRONG_PARAMETER_COUNT "wrong parameter count \n"
 #define KEY_PASSKEY_LEN       (6U)
@@ -1333,9 +1334,9 @@ static void cmd_sup_timeout_set(nrf_cli_t const * p_cli, size_t argc, char ** ar
 
 /**@brief Command handler for changing TX power.
  */
-static void cmd_tx_power_set(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+static int8_t cmd_tx_power_set(nrf_cli_t const * p_cli, size_t argc, char ** argv)
 {
-    uint16_t value;
+    int8_t value;
     uint16_t check;
     uint16_t valid;
 
@@ -1361,8 +1362,9 @@ static void cmd_tx_power_set(nrf_cli_t const * p_cli, size_t argc, char ** argv)
         nrf_cli_fprintf(p_cli, 
                         NRF_CLI_ERROR, 
                         "Unvalid number, TX power must be either if the following values:\n -40, -20, -16, -12, -8, -4, 0, +2, +3, +4, +5, +6, +7, +8\n");
-
+        return INVALID_INPUT_ERROR;
     }
+    return value;
 }
 
 /**@brief Command handler for setting connection parameters.
