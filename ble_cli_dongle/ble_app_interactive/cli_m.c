@@ -1677,7 +1677,7 @@ static void cmd_device_name_set(nrf_cli_t const * p_cli, size_t argc, char ** ar
 
         strcat(buf, " ");
     }
-
+    adv_stop();
     // Set new device name.
     err_code = sd_ble_gap_device_name_set(&sec_mode,
                                           (const uint8_t *)buf,
