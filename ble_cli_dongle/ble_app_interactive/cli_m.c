@@ -1458,6 +1458,7 @@ static void cmd_devices_display_details(nrf_cli_t const * p_cli, size_t argc, ch
     // Print connectable devices from scan data.
     scanned_device_t * p_device_list = scan_device_info_get();
     device_list_print_details(p_cli, p_device_list);
+    scan_device_info_clear();
 }
 
 
