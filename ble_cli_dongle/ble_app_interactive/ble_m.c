@@ -90,6 +90,26 @@
  */
 #define APP_BLE_OBSERVER_PRIO     1
 
+#define APP_BLE_CONN_CFG_TAG            1                                  /**< A tag identifying the SoftDevice BLE configuration. */
+
+#define NON_CONNECTABLE_ADV_INTERVAL    MSEC_TO_UNITS(100, UNIT_0_625_MS)  /**< The advertising interval for non-connectable advertisement (100 ms). This value can vary between 100ms to 10.24s). */
+
+
+/* Advertisement parameters */
+static uint8_t advertising_flags = APP_GAP_FLAGS;
+static uint16_t advertising_company_id = APP_COMPANY_IDENTIFIER;
+static uint8_t advertising_length = APP_BEACON_INFO_LENGTH_MAX;
+static int8_t advertising_tx_power_level = RADIO_TXPOWER_TXPOWER_0dBm;
+
+/**< Information advertised by the Beacon. */
+static uint8_t m_beacon_info[APP_BEACON_INFO_LENGTH_MAX] =                    
+{
+    APP_BEACON_UUID_DEFAULT,     // 16 bit custom data
+    APP_CUSTOM_DEFAULT_VALUE1,
+    APP_CUSTOM_DEFAULT_VALUE2,
+    APP_CUSTOM_DEFAULT_VALUE3,
+};
+
 BLE_BAS_DEF(m_bas);
 NRF_BLE_GATT_DEF(m_gatt);           /**< GATT module instance. */
 BLE_ADVERTISING_DEF(m_advertising); /**< Advertising module instance. */
@@ -1697,6 +1717,53 @@ void adv_stop(void)
 }
 
 
+void adv_write_custom_data(uint8_t adv_len, uint8_t * adv_data)
+{
+    adv_stop();
+    for(uint8_t i = APP_BEACON_UUID_NUM_BYTES; i < APP_BEACON_UUID_NUM_BYTES + adv_len; i++)
+    {
+        m_beacon_info[i] = adv_data[i];
+    }
+    advertising_length = APP_BEACON_UUID_NUM_BYTES + adv_len;
+    advertising_init();
+    adv_start();
+}
+
+void adv_write_uuid(uint8_t * uuid)
+{
+    adv_stop();
+    for(uint8_t i = 0; i < APP_BEACON_UUID_NUM_BYTES; i++)
+    {
+        m_beacon_info[i] = uuid[i];
+    }
+    advertising_init();
+    adv_start();
+}
+
+void adv_write_company_id(uint16_t company_id)
+{
+    adv_stop();
+    advertising_company_id = company_id;
+    advertising_init();
+    adv_start();
+}
+
+void adv_write_flags(uint8_t flags)
+{
+    adv_stop();
+    advertising_flags = flags;
+    advertising_init();
+    adv_start();
+}
+
+void adv_write_tx_power(int8_t tx_power)
+{
+    adv_stop();
+    advertising_tx_power_level = tx_power;
+    advertising_init();
+    adv_start();
+}
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupts.
@@ -1876,14 +1943,21 @@ void advertising_init(void)
 {
     ret_code_t             err_code;
     ble_advertising_init_t init;
-
     memset(&init, 0, sizeof(init));
 
-    init.advdata.name_type               = BLE_ADVDATA_FULL_NAME;
-    init.advdata.include_appearance      = true;
-    init.advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-    init.advdata.uuids_complete.p_uuids  = m_adv_uuids;
+    init.advdata.name_type               = BLE_ADVDATA_SHORT_NAME;
+    // init.advdata.name_type               = BLE_ADVDATA_NO_NAME;
+    init.advdata.short_name_len          = APP_SHORT_NAME_LENGTH;
+    init.advdata.include_appearance      = false;
+    init.advdata.flags                   = advertising_flags;
+    
+    init.advdata.p_tx_power_level = &advertising_tx_power_level;
+    ble_advdata_manuf_data_t manuf_specific_data;
+    manuf_specific_data.company_identifier = advertising_company_id;
+
+    manuf_specific_data.data.p_data = (uint8_t *) m_beacon_info;
+    manuf_specific_data.data.size   = advertising_length;
+    init.advdata.p_manuf_specific_data = &manuf_specific_data;
 
     init.config.ble_adv_fast_enabled  = true;
     init.config.ble_adv_fast_interval = ADV_INTERVAL;

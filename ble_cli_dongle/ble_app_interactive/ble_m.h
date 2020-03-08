@@ -67,6 +67,48 @@
                                                                                                           The hex number in the string format takes twice as much space. 6 is added in place of ":" or spaces beetwen numbers and for the string terminator. */
 #define HEX_BYTE_STRING_LEN     (3)                                                                  /**< Determines string length for a 1-byte hex number. */
 
+/* 
+Basic calculation of bytes used and available for custom data
+
+
+flag: 2 + 1       = 3 bytes
+short name: 6 + 2 = 8 bytes
+tx power: 2 + 1   = 3 bytes
+---------------------------
+total:             14 bytes
+
+manufacturer meta:  2 bytes
+manufacturer id:    2 bytes
+---------------------------
+total:             18 bytes
+
+13 bytes remaining for custom use
+
+ */
+
+
+
+
+
+#define APP_BEACON_INFO_LENGTH_MAX      0xd                               /**< Total length of information advertised by the Beacon. */
+#define APP_SHORT_NAME_LENGTH           0x06
+#define APP_COMPANY_IDENTIFIER          0x0059                             /**< Company identifier for Nordic Semiconductor ASA. as per www.bluetooth.org. */
+#define APP_GAP_FLAGS                   BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE
+
+
+/* UUID can be used as a uinque serial number  to differentiate beacons
+ * Could be smaller to allow for more bytes for custom use 
+ */
+#define APP_BEACON_UUID_NUM_BYTES       0xd // only 13 available bytes for uuid
+#define APP_BEACON_UUID_DEFAULT         0x01, 0x12, 0x23, 0x34, \
+                                        0x45, 0x56, 0x67, 0x78, \
+                                        0x89, 0x9a, 0xab, 0xbc, \
+                                        0xcd, 0xde, 0xef, 0xf0            /**< Proprietary UUID for Beacon. */
+
+#define APP_CUSTOM_DEFAULT_VALUE1               0xCA
+#define APP_CUSTOM_DEFAULT_VALUE2               0xFE
+#define APP_CUSTOM_DEFAULT_VALUE3               0xBA
+
 typedef struct
 {
     bool    is_not_empty;                   /**< Indicates that the structure is not empty. */
@@ -81,7 +123,6 @@ typedef struct
     uint8_t * p_data;   /**< Pointer to data. */
     uint16_t  data_len; /**< Length of data. */
 } data_t;
-
 
 /**@brief Function for establishing a connection with a device that uses privacy.
  *
@@ -235,6 +276,13 @@ void adv_start(void);
  */
 void adv_stop(void);
 
+/**@brief Function for writing custom part of advetising packet
+ */
+void adv_write_custom_data(uint8_t adv_len, uint8_t * adv_data);
+void adv_write_uuid(uint8_t * uuid);
+void adv_write_company_id(uint16_t company_id);
+void adv_write_flags(uint8_t flags);
+void adv_write_tx_power(int8_t tx_power);
 
 /**@brief Function for stopping scanning.
  */

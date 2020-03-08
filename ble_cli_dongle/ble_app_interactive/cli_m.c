@@ -1729,6 +1729,146 @@ static void cmd_advertise_off(nrf_cli_t const * p_cli, size_t argc, char ** argv
     nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Advertising disabled\n");
 }
 
+static void cmd_advertise_write_custom_data(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    ret_code_t err_code;
+
+    if (argc < 2)
+    {
+        nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, WRONG_PARAMETER_COUNT);
+        return;
+    }
+    uint8_t len = argc - 1;
+    if (len > (APP_BEACON_INFO_LENGTH_MAX - APP_BEACON_UUID_NUM_BYTES))
+    {
+        nrf_cli_fprintf(p_cli,
+                        NRF_CLI_ERROR,
+                        "Max allowed bytes in custom data is %d.\n", APP_BEACON_INFO_LENGTH_MAX - APP_BEACON_UUID_NUM_BYTES);
+                        return;                        
+    }
+
+    uint8_t adv_data[len];
+    for(uint8_t i = 0; i < len; i++)
+    {
+        uint8_t value = strtoul(argv[i+1], NULL, 16);
+        if(value == 0)  
+        {
+            if(!isdigit((int) argv[i+1][0]))
+            {
+                nrf_cli_fprintf(p_cli,
+                                NRF_CLI_ERROR,
+                                "Packet bytes must be a numbers between 0-255.\n");
+                return;
+            }
+        }
+        adv_data[i] = value;
+    }
+    adv_write_custom_data(len, adv_data);
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Advertising custom data updated\n");
+}
+
+static void cmd_advertise_write_uuid(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    ret_code_t err_code;
+
+    if (argc < 2)
+    {
+        nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, WRONG_PARAMETER_COUNT);
+        return;
+    }
+    uint8_t len = argc - 1;
+    if (len > APP_BEACON_UUID_NUM_BYTES)
+    {
+        nrf_cli_fprintf(p_cli,
+                        NRF_CLI_ERROR,
+                        "UUID is specified to be %d number of bytes.\n", APP_BEACON_UUID_NUM_BYTES);
+        return;                        
+    }
+
+    uint8_t adv_data[APP_BEACON_UUID_NUM_BYTES];
+    for(uint8_t i = 0; i < APP_BEACON_UUID_NUM_BYTES; i++)
+    {
+        uint8_t value = strtoul(argv[i+1], NULL, 16);
+        if(value == 0)  
+        {
+            if(!isdigit((int) argv[i+1][0]))
+            {
+                nrf_cli_fprintf(p_cli,
+                                NRF_CLI_ERROR,
+                                "Packet bytes must be a numbers between 0-255.\n");
+                return;
+            }
+        }
+        adv_data[i] = value;
+    }
+    adv_write_uuid(adv_data);
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Advertising UUID updated\n");
+}
+
+static void cmd_advertise_write_company_id(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    ret_code_t err_code;
+
+    if (argc > 3)
+    {
+        nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, WRONG_PARAMETER_COUNT);
+        return;
+    }
+    uint16_t company_id;
+    for(uint8_t i = 1; i < 3; i++) // Company ID is only two bytes,
+    {
+        uint8_t value = strtoul(argv[i], NULL, 16);
+        if(value == 0)
+        {
+            if(!isdigit((int) argv[i][0]))
+            {
+                nrf_cli_fprintf(p_cli,
+                                NRF_CLI_ERROR,
+                                "Packet bytes must be a numbers between 0-255.\n");
+                return;
+            }
+        }
+        if (i == 1)
+            company_id = value << 8;
+        else
+            company_id |= value;
+    }
+    adv_write_company_id(company_id);
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Advertising company ID updated 0x%04x\n", company_id);
+}
+
+static void cmd_advertise_write_flags(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    ret_code_t err_code;
+
+    if (argc > 3)
+    {
+        nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, WRONG_PARAMETER_COUNT);
+        return;
+    } 
+    uint8_t value = strtoul(argv[1], NULL, 16);
+    if(value == 0)
+    {
+        if(!isdigit((int) argv[1][0]))
+        {
+            nrf_cli_fprintf(p_cli,
+                            NRF_CLI_ERROR,
+                            "Packet bytes must be a numbers between 0-255.\n");
+            return;
+        }
+    }   
+    adv_write_flags(value);
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Advertising flags updated\n");
+}
+
+static void cmd_advertise_write_tx_power(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    int8_t tx_value_from_input = cmd_tx_power_set(p_cli, argc, argv);
+    if(tx_value_from_input != INVALID_INPUT_ERROR)
+    {
+        adv_write_tx_power(tx_value_from_input);
+    }
+}
 
 static void cmd_advertise(nrf_cli_t const * p_cli, size_t argc, char ** argv)
 {
@@ -2125,7 +2265,7 @@ NRF_CLI_CREATE_STATIC_SUBCMD_SET(m_sub_parameters)
     NRF_CLI_CMD(phy, &m_sub_phy, "<subcmd> <address> PHY change.  ", cmd_phy),
     NRF_CLI_CMD(slave_latency, NULL, "<value> Set slave latency.", cmd_slave_latency_set),
     NRF_CLI_CMD(sup_timeout, NULL, "<value> Set connection supervision time-out.", cmd_sup_timeout_set),
-    NRF_CLI_CMD(tx_power, NULL, "<value> Set tx power [hex].", cmd_tx_power_set),
+    NRF_CLI_CMD(tx_power, NULL, "<value> Set tx power.", cmd_tx_power_set),
     NRF_CLI_SUBCMD_SET_END
 };
 NRF_CLI_CREATE_STATIC_SUBCMD_SET(m_sub_remove)
@@ -2148,6 +2288,12 @@ NRF_CLI_CREATE_STATIC_SUBCMD_SET(m_sub_advertise)
 {
     NRF_CLI_CMD(off, NULL, "Advertising off.", cmd_advertise_off),
     NRF_CLI_CMD(on, NULL, "Advertising on.", cmd_advertise_on),
+    // NRF_CLI_CMD(write_packet, NULL, "Write packet.", cmd_advertise_write_packet),
+    NRF_CLI_CMD(write_custom_data, NULL, "Write custom data fields.", cmd_advertise_write_custom_data),
+    NRF_CLI_CMD(write_uuid, NULL, "Write uuid fields.", cmd_advertise_write_uuid),
+    NRF_CLI_CMD(write_company_id, NULL, "Write company_id.", cmd_advertise_write_company_id),
+    NRF_CLI_CMD(write_flags, NULL, "Write flags.", cmd_advertise_write_flags),
+    NRF_CLI_CMD(write_tx_power, NULL, "Write and set tx power in adv packet and in radio.", cmd_advertise_write_tx_power),
 	NRF_CLI_SUBCMD_SET_END
 };
 
@@ -2163,6 +2309,7 @@ NRF_CLI_CMD_REGISTER(connected_devices,
                      NULL,
                      "Display connected devices and information about security level.",
                      cmd_connected_display);
+                     
 NRF_CLI_CMD_REGISTER(privacy, &m_sub_privacy, "Set privacy settings.", cmd_privacy);
 NRF_CLI_CMD_REGISTER(numeric,
                      &m_sub_numeric,
