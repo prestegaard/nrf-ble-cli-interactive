@@ -4,9 +4,9 @@ Modified the BLE CLI interactive example from the nRF SDK 16.0.0, found here htt
 
 ## Changes from SDK example
 * Changed format of advertising packet
-** Use short name of 6 bytes instead of long name
-** Include TX power
-** Only use 13 byte custom data
+  * Use short name of 6 bytes instead of long name
+  * Include TX power
+  * Only use 13 byte custom data
 
 * Added command to update TX power both physically and in advertisement packet
 * Added command to update comapny ID in advertisement packet
