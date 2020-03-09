@@ -747,12 +747,12 @@
 
 // <o> SCAN_LIST_REFRESH_INTERVAL - Time after which the device scan list will be cleaned and refreshed. 
 #ifndef SCAN_LIST_REFRESH_INTERVAL
-#define SCAN_LIST_REFRESH_INTERVAL 10000
+#define SCAN_LIST_REFRESH_INTERVAL 800
 #endif
 
 // <o> SCAN_WINDOW - Scanning window, determines scan window in units of 0.625 millisecond. 
 #ifndef SCAN_WINDOW
-#define SCAN_WINDOW 80
+#define SCAN_WINDOW 160
 #endif
 
 // </h> 
